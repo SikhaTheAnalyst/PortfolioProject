@@ -1,3 +1,6 @@
+/* COVID 19 Data Exploration
+Skills Used : Joins, Aggregate Functions, CTEs, Window Functions, Temp Tables, Creating Views 
+
 select * 
 from PortfolioProject..Covid_Deaths
 order by 3,4
@@ -41,8 +44,9 @@ from PortfolioProject..Covid_Deaths
 where continent is not null
 Group by location
 order by TotalDeathCount desc
+
 --lets break things down by continent
---correct one
+
 select location, Max(cast(Total_deaths as int)) as TotalDeathCount
 from PortfolioProject..Covid_Deaths
 where continent is null
@@ -60,7 +64,9 @@ from PortfolioProject.. Covid_Deaths
 where continent like 'Oceania'
 
 --creating views
+
 --Global Numbers
+
 select date,sum(new_cases) as TotalCase, sum(cast(new_deaths as int)) as Totaldeaths,(sum(cast(new_deaths as int))/sum(new_cases))*100 as death_percentage
 from PortfolioProject..Covid_Deaths
 where continent is not null
@@ -71,7 +77,9 @@ select sum(new_cases) as TotalCase, sum(cast(new_deaths as int)) as TotalDeaths,
 from PortfolioProject..Covid_Deaths
 where continent is not null
 order by 1,2
+
 --Looking at total Population Vs Vaccinations
+
 select dea.continent,dea.location,dea.date,dea.population,vac.new_vaccinations,
  sum(convert(int,new_vaccinations)) over(partition by dea.location order by dea.location,dea.date) as RollingPeopleVaccinated
 from PortfolioProject..Covid_Deaths dea
@@ -81,7 +89,8 @@ and dea.date=vac.date
 where dea.continent is not null
 order by 2,3
 
--- use cte
+-- Using CTE
+
 with populationVSvaccination(continent,location,date,population,new_vaccinations,RollingPeopleVaccinated)
 as
 (
@@ -98,6 +107,7 @@ from populationVSvaccination
 
 
 --Temp Table
+
 select * 
 from PortfolioProject..Covid_Deaths
 order by 3,4
@@ -109,10 +119,12 @@ order by 3,4
 select location,date,total_cases,new_cases,total_deaths,population
 from PortfolioProject..Covid_Deaths
 order by 1,2
+
 select len(location) from PortfolioProject..Covid_Deaths
 
----selecting total_cases and total_deaths 
----showing the likelihood of dying if you get covid
+--selecting total_cases and total_deaths 
+--showing the likelihood of dying if you get covid
+
 select location,date,total_cases,total_deaths,(total_deaths/total_cases)*100 as death_percentage
 from PortfolioProject..Covid_Deaths
 where location='India'
@@ -141,6 +153,7 @@ from PortfolioProject..Covid_Deaths
 where continent is not null
 Group by location
 order by TotalDeathCount desc
+
 --lets break things down by continent
 
 select location, Max(cast(Total_deaths as int)) as TotalDeathCount
@@ -161,6 +174,7 @@ where continent like 'Oceania'
 
 --creating views
 --Global Numbers
+
 select date,sum(new_cases) as TotalCase, sum(cast(new_deaths as int)) as Totaldeaths,(sum(cast(new_deaths as int))/sum(new_cases))*100 as death_percentage
 from PortfolioProject..Covid_Deaths
 where continent is not null
@@ -171,7 +185,9 @@ select sum(new_cases) as TotalCase, sum(cast(new_deaths as int)) as TotalDeaths,
 from PortfolioProject..Covid_Deaths
 where continent is not null
 order by 1,2
+
 --Looking at total Population Vs Vaccinations
+
 select dea.continent,dea.location,dea.date,dea.population,vac.new_vaccinations,
  sum(convert(int,new_vaccinations)) over(partition by dea.location order by dea.location,dea.date) as RollingPeopleVaccinated
 from PortfolioProject..Covid_Deaths dea
@@ -181,7 +197,7 @@ and dea.date=vac.date
 where dea.continent is not null
 order by 2,3
 
--- use cte
+-- use CTE
 with populationVSvaccination(continent,location,date,population,new_vaccinations,RollingPeopleVaccinated)
 as
 (
@@ -198,6 +214,7 @@ from populationVSvaccination
 
 
 --Temp Table
+
 drop table if exists #percentpopulationvaccinated
 create table #percentpopulationvaccinated
 (
@@ -220,6 +237,7 @@ select *, (RollingPeopleVaccinated/population)*100 as percentRPV
 from #percentpopulationvaccinated
 
 ---creating a view to store data for later visualization
+
 drop view if exists percentpopvac
 create view percentpopvac as 
 select dea.continent,dea.location,dea.date,dea.population,vac.new_vaccinations,
@@ -254,6 +272,7 @@ where dea.continent is not null
 
 
 ---create view to store data for later visualization
+
 drop view if exists ContinentVsTotalDeathCount
 create view ContinentVsTotalDeathCount as
 select continent, Max(cast(Total_deaths as int)) as TotalDeathCount
@@ -262,6 +281,8 @@ where continent is not null
 Group by continent
 
 --create view to store data for later visualization
+
+drop view if exists popVsvac
 create view popVsvac as
 select dea.continent,dea.location,dea.date,dea.population,vac.new_vaccinations,
  sum(convert(int,new_vaccinations)) over(partition by dea.location order by dea.location,dea.date) as RollingPeopleVaccinated
